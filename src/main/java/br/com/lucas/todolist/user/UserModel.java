@@ -1,36 +1,22 @@
 package br.com.lucas.todolist.user;
 
-public class UserModel {
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-    private String name;
-    private String userName;
-    private String password;
+    @Data
+    public class UserModel {
 
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
+        @Getter @Setter
+        private String name;
+        private String userName;
+        private String password;
 
-    public String getUserName() {
-        return userName;
-    }
-    public void setUserName(String userName){
-        this.userName = userName;
-    }
+        public UserModel(){}
+        public UserModel(String name, String email, String password){
+            this.name = name;
+            this.userName = email;
+            this.password = password;
+        }
 
-    public String getPassword() {
-        return password;
     }
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public UserModel(){}
-    public UserModel(String name, String email, String password){
-        this.name = name;
-        this.userName = email;
-        this.password = password;
-    }
-}
