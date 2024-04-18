@@ -1,5 +1,6 @@
 package br.com.lucas.todolist.user;
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
 import jakarta.persistence.Column;
 import lombok.Data;
 import jakarta.persistence.Entity;
@@ -21,10 +22,7 @@ public class UserModel {
     @CreationTimestamp private LocalDateTime createdAt;
 
     public UserModel(){}
-    public UserModel(String name, String email, String password){
-        this.name = name;
-        this.userName = email;
-        this.password = password;
-    }
+
+
 
 }
