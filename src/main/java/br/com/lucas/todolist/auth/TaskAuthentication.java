@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
 import java.io.IOException;
 import java.util.Base64;
 
@@ -38,16 +39,23 @@ public class TaskAuthentication extends OncePerRequestFilter {
             String[] credentials = authString.split(":");
             String username = credentials[0];
             String password = credentials[1];
+
             //Validando usuário usando o UserRepository
             var user = this.userRepository.findByUserName(username);
             if (user == null) {
                 response.sendError(401); //Solicitação recusada (credenciais)
-            } else {
+            }
+            else {
                 //Validando senha usando o Bcrypt
                 var passwordVerifier = BCrypt.verifyer().verify(password.toCharArray(), user.getPassword());
+
                 if (passwordVerifier.verified) {
+                    //Recuperando idUser de User para setar no idUser da task
+                    request.setAttribute("idUser", user.getId());
                     filterChain.doFilter(request, response);
-                } else {
+                }
+
+                else {
                     response.sendError(401); //Solicitação recusada
                 }
             }
