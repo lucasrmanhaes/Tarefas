@@ -20,31 +20,42 @@ public class TaskAuthentication extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
-        //Capturando usuário e senha
-        String authorization = request.getHeader("Authorization");
-        //Separando Base64
-        String authEncoded = authorization.substring("Basic".length()).trim();
-        //Convertendo base64 para um array de byte
-        byte[] authDecode = Base64.getDecoder().decode(authEncoded);
-        //convertendo array de byte para String
-        String authString = new String(authDecode);
-        //Separando a String username:password
-        String[] credentials = authString.split(":");
-        String username = credentials[0];
-        String password = credentials[1];
-        //Validando usuário usando o UserRepository
-        var User = this.userRepository.findByUserName(username);
-        if (User == null) {
-            response.sendError(401); //Solicitação recusada (credenciais)
-        } else {
-            //Validando senha usando o Bcrypt
-            var passwordVerifier = BCrypt.verifyer().verify(password.toCharArray(), User.getPassword());
-            if (passwordVerifier.verified) {
-                filterChain.doFilter(request, response);
+        throws ServletException, IOException {
+
+        //Criando o contexto da autenticação apenas a task com o servletPath
+        var servletPath = request.getServletPath();
+        //Se a rota for para tasks fazer autenticação
+        if (servletPath.equals("/tasks/")) {
+            //Capturando usuário e senha
+            var authorization = request.getHeader("Authorization");
+            //Separando Base64
+            var authEncoded = authorization.substring("Basic".length()).trim();
+            //Convertendo base64 para um array de byte
+            byte[] authDecode = Base64.getDecoder().decode(authEncoded);
+            //convertendo array de byte para String
+            var authString = new String(authDecode);
+            //Separando a String username:password
+            String[] credentials = authString.split(":");
+            String username = credentials[0];
+            String password = credentials[1];
+            //Validando usuário usando o UserRepository
+            var user = this.userRepository.findByUserName(username);
+            if (user == null) {
+                response.sendError(401); //Solicitação recusada (credenciais)
             } else {
-                response.sendError(403); //Solicitação recusada
+                //Validando senha usando o Bcrypt
+                var passwordVerifier = BCrypt.verifyer().verify(password.toCharArray(), user.getPassword());
+                if (passwordVerifier.verified) {
+                    filterChain.doFilter(request, response);
+                } else {
+                    response.sendError(401); //Solicitação recusada
+                }
             }
         }
+        //Senão a rota segue normalmente
+        else{
+            filterChain.doFilter(request, response);
+        }
+
     }
 }
