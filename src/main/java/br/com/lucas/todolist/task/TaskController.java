@@ -1,15 +1,10 @@
 package br.com.lucas.todolist.task;
 
-import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -27,16 +22,27 @@ public class TaskController {
         var idUser = request.getAttribute("idUser");
         taskModel.setIdUser((UUID) idUser);
 
-        //Validando data para criação da task
+        //Validando data para criação/finalização da task deve ser maior que a data do servidor
         var currentDate = LocalDateTime.now();
-        System.out.println(currentDate);
-        if(currentDate.isAfter(taskModel.getStartAt())){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("A data de inicio deve ser maior que a data atual");
+        if(currentDate.isAfter(taskModel.getStartAt())  || currentDate.isAfter(taskModel.getEndAt())){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("A data de inicio/termino deve ser maior que a data atual");
         }
 
+        //Validando data da criação da task deve ser menor que a data da finalização da task
+        if(taskModel.getStartAt().isAfter(taskModel.getEndAt())){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("A data de inicio da tarefa deve ser maior que a data de término");
+        }
+
+        //Rota autorizada
         var task = taskRepository.save(taskModel);
         return ResponseEntity.status(HttpStatus.OK).body(task);
 
+    }
+
+    @GetMapping("/")
+    public ResponseEntity listTasks(HttpServletRequest request){
+        var idUser = request.getAttribute("idUser");
+        return ResponseEntity.status(HttpStatus.OK).body(taskRepository.findByIdUser((UUID) idUser));
     }
 
 }

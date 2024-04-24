@@ -27,6 +27,7 @@ public class TaskAuthentication extends OncePerRequestFilter {
         var servletPath = request.getServletPath();
         //Se a rota for para tasks fazer autenticação
         if (servletPath.equals("/tasks/")) {
+
             //Capturando usuário e senha
             var authorization = request.getHeader("Authorization");
             //Separando Base64
