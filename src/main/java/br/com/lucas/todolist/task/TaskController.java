@@ -21,10 +21,9 @@ public class TaskController {
         //Recuperando idUser de User da Auth para setar no idUser da task
         var idUser = request.getAttribute("idUser");
         taskModel.setIdUser((UUID) idUser);
-
         //Validando data para criação/finalização da task deve ser maior que a data do servidor
         var currentDate = LocalDateTime.now();
-        if(currentDate.isAfter(taskModel.getStartAt())  || currentDate.isAfter(taskModel.getEndAt())){
+        if(currentDate.isAfter(taskModel.getStartAt()) || currentDate.isAfter(taskModel.getEndAt())){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("A data de inicio/termino deve ser maior que a data atual");
         }
 
@@ -43,6 +42,15 @@ public class TaskController {
     public ResponseEntity listTasks(HttpServletRequest request){
         var idUser = request.getAttribute("idUser");
         return ResponseEntity.status(HttpStatus.OK).body(taskRepository.findByIdUser((UUID) idUser));
+    }
+
+    //127.0.0.1:8080/tasks/ab20ecc7-3844-4d16-b130-63205a75215a
+    @PutMapping("/{id}")
+    public ResponseEntity updateTask(@RequestBody TaskModel taskModel, HttpServletRequest request, @PathVariable UUID id){
+        var idUser = request.getAttribute("idUser");
+        taskModel.setIdUser((UUID) idUser);
+        taskModel.setId(id);
+        return ResponseEntity.status(HttpStatus.OK).body(taskRepository.save(taskModel));
     }
 
 }

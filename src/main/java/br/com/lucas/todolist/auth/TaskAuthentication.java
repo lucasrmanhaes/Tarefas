@@ -25,8 +25,9 @@ public class TaskAuthentication extends OncePerRequestFilter {
 
         //Criando o contexto da autenticação apenas a task com o servletPath
         var servletPath = request.getServletPath();
-        //Se a rota for para tasks fazer autenticação
-        if (servletPath.equals("/tasks/")) {
+
+        //Se a rota começar com tasks e ter mais algum parametro fazer autenticação
+        if (servletPath.startsWith("/tasks/")) {
 
             //Capturando usuário e senha
             var authorization = request.getHeader("Authorization");
