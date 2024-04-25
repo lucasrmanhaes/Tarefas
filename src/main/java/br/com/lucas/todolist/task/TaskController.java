@@ -1,11 +1,15 @@
 package br.com.lucas.todolist.task;
 
+import br.com.lucas.todolist.utils.Utils;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -46,11 +50,15 @@ public class TaskController {
 
     //127.0.0.1:8080/tasks/ab20ecc7-3844-4d16-b130-63205a75215a
     @PutMapping("/{id}")
-    public ResponseEntity updateTask(@RequestBody TaskModel taskModel, HttpServletRequest request, @PathVariable UUID id){
-        var idUser = request.getAttribute("idUser");
-        taskModel.setIdUser((UUID) idUser);
-        taskModel.setId(id);
-        return ResponseEntity.status(HttpStatus.OK).body(taskRepository.save(taskModel));
+    public ResponseEntity updateTask(@RequestBody TaskModel taskModel,  @PathVariable UUID id){
+
+        //Buscando task pela id
+        var task = this.taskRepository.findById(id).orElse(null);
+
+        //Copiando os atributos não-nulos passados na requisição para o objeto task da repository
+        Utils.copyNonNullProperties(taskModel, task);
+
+        return ResponseEntity.status(HttpStatus.OK).body(taskRepository.save(task));
     }
 
 }
