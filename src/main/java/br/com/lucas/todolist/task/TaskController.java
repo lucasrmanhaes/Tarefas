@@ -50,15 +50,21 @@ public class TaskController {
 
     //127.0.0.1:8080/tasks/ab20ecc7-3844-4d16-b130-63205a75215a
     @PutMapping("/{id}")
-    public ResponseEntity updateTask(@RequestBody TaskModel taskModel,  @PathVariable UUID id){
-
+    public ResponseEntity updateTask(@RequestBody TaskModel taskModel,  @PathVariable UUID id, HttpServletRequest request){
         //Buscando task pela id
         var task = this.taskRepository.findById(id).orElse(null);
-
         //Copiando os atributos não-nulos passados na requisição para o objeto task da repository
         Utils.copyNonNullProperties(taskModel, task);
 
-        return ResponseEntity.status(HttpStatus.OK).body(taskRepository.save(task));
+
+        System.out.println("idUser da requisição: " + request.getAttribute("idUser") + "\n" + "idUser do repository: " + task.getIdUser());
+        //Criando validação de usuário para atualização de tasks
+        if(taskModel.getIdUser().equals(task.getIdUser())){
+            return ResponseEntity.status(HttpStatus.OK).body(taskRepository.save(task));
+        }else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Usuário não tem permissão");
+        }
+
     }
 
 }
