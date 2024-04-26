@@ -53,17 +53,22 @@ public class TaskController {
     public ResponseEntity updateTask(@RequestBody TaskModel taskModel,  @PathVariable UUID id, HttpServletRequest request){
         //Buscando task pela id
         var task = this.taskRepository.findById(id).orElse(null);
-        //Copiando os atributos não-nulos passados na requisição para o objeto task da repository
-        Utils.copyNonNullProperties(taskModel, task);
+
+        //Verificando se a tarefa existe
+        if(task == null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Tarefa não encontrada");
+        }
 
         //Buscando id do usuario da task e id do usuario da autenticacao
-        var userTask = task.getIdUser();
         var userRequest = request.getAttribute("idUser");
 
         //Criando validação de usuário dono da task para atualização de tasks
-        if(!userRequest.equals(userTask)){
+        if(!userRequest.equals(task.getIdUser())){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Usuário não autorizado");
         }
+
+        //Copiando os atributos não-nulos passados na requisição para o objeto task da repository
+        Utils.copyNonNullProperties(taskModel, task);
         return ResponseEntity.status(HttpStatus.OK).body(taskRepository.save(task));
     }
 
