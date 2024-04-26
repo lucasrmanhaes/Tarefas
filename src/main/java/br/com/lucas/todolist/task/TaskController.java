@@ -56,15 +56,15 @@ public class TaskController {
         //Copiando os atributos não-nulos passados na requisição para o objeto task da repository
         Utils.copyNonNullProperties(taskModel, task);
 
+        //Buscando id do usuario da task e id do usuario da autenticacao
+        var userTask = task.getIdUser();
+        var userRequest = request.getAttribute("idUser");
 
-        System.out.println("idUser da requisição: " + request.getAttribute("idUser") + "\n" + "idUser do repository: " + task.getIdUser());
-        //Criando validação de usuário para atualização de tasks
-        if(taskModel.getIdUser().equals(task.getIdUser())){
-            return ResponseEntity.status(HttpStatus.OK).body(taskRepository.save(task));
-        }else{
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Usuário não tem permissão");
+        //Criando validação de usuário dono da task para atualização de tasks
+        if(!userRequest.equals(userTask)){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Usuário não autorizado");
         }
-
+        return ResponseEntity.status(HttpStatus.OK).body(taskRepository.save(task));
     }
 
 }
