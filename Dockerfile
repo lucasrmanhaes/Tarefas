@@ -2,16 +2,16 @@
 FROM ubuntu:latest AS BUILD
 
 #Atualizando sistema
-RUN apt-get update
+RUN apt update
 
 #Instalando JDK-17 -y: yes em tudo
-RUN apt-get install openjdk-17-jdk y-
+RUN apt install openjdk-17-jre -y
 
 #Copiar todo o conteudo do diretorio do docker file para a imagem do ubuntu
 COPY . .
 
 #Instalando o maven
-RUN apt-get install maven -y
+RUN apt install maven -y
 
 #Instalando aplicação
 RUN mvn clean install
