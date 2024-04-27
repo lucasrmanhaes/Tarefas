@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>br.com.lucas</groupId>
-	<artifactId>todolist</artifactId>
+	<artifactId>taskgenius</artifactId>
 	<version>1.0.0</version>
-	<name>todolist</name>
+	<name>Task Genius</name>
 	<description>Gerenciador de tarefas</description>
 	<properties>
 		<java.version>17</java.version>
