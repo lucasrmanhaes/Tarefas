@@ -22,8 +22,5 @@ EXPOSE 8080
 #Copiando o jar da nossa aplicação para um arquivo app.jar
 COPY --from=build /target/taskgenius-1.0.0.jar app.jar
 
-#Registrando meu nome
-LABEL authors="Lucas Manhães"
-
 # Para iniciar uma aplicaçao usamos o java -jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]
