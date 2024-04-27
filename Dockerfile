@@ -10,7 +10,7 @@ RUN apt-get install openjdk-17-jdk y-
 #Copiar todo o conteudo do diretorio do docker file para a imagem do ubuntu
 COPY . .
 
-#Instando o maven
+#Instalando o maven
 RUN apt-get install maven -y
 
 #Instalando aplicação
@@ -20,7 +20,7 @@ RUN mvn clean install
 EXPOSE 8080
 
 #Copiando o jar da nossa aplicação para um arquivo app.jar
-COPY --from=build /target/todolist-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=build /target/taskgenius-1.0.0.jar app.jar
 
 #Registrando meu nome
 LABEL authors="Lucas Manhães"
