@@ -14,7 +14,7 @@ COPY . .
 RUN apt-get install maven -y
 
 #Aplicando imagem base da JDK
-FROM openjdk:17-jdk-slimg
+FROM openjdk:17-jdk-slim
 
 #Instalando aplicação
 RUN mvn clean install
