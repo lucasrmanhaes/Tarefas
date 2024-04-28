@@ -20,7 +20,7 @@ public class TaskController {
     TaskRepository taskRepository;
 
     @PostMapping("/")
-    public ResponseEntity create(@RequestBody TaskModel taskModel, HttpServletRequest request){
+    public ResponseEntity createTask(@RequestBody TaskModel taskModel, HttpServletRequest request){
 
         //Recuperando idUser de User da Auth para setar no idUser da task
         var idUser = request.getAttribute("idUser");
@@ -45,7 +45,7 @@ public class TaskController {
     @GetMapping("/")
     public ResponseEntity listTasks(HttpServletRequest request){
         var idUser = request.getAttribute("idUser");
-        return ResponseEntity.status(HttpStatus.OK).body(taskRepository.findByIdUser((UUID) idUser));
+        return ResponseEntity.status(HttpStatus.OK).body(this.taskRepository.findByIdUser((UUID) idUser));
     }
 
     //127.0.0.1:8080/tasks/ab20ecc7-3844-4d16-b130-63205a75215a
@@ -54,13 +54,13 @@ public class TaskController {
         //Buscando task pela id
         var task = this.taskRepository.findById(id).orElse(null);
 
+        //Buscando id do usuario da task e id do usuario da autenticacao
+        var userRequest = request.getAttribute("idUser");
+
         //Verificando se a tarefa existe
         if(task == null){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Tarefa não encontrada");
         }
-
-        //Buscando id do usuario da task e id do usuario da autenticacao
-        var userRequest = request.getAttribute("idUser");
 
         //Criando validação de usuário dono da task para atualização de tasks
         if(!userRequest.equals(task.getIdUser())){
@@ -69,7 +69,29 @@ public class TaskController {
 
         //Copiando os atributos não-nulos passados na requisição para o objeto task da repository
         Utils.copyNonNullProperties(taskModel, task);
-        return ResponseEntity.status(HttpStatus.OK).body(taskRepository.save(task));
+        return ResponseEntity.status(HttpStatus.OK).body(this.taskRepository.save(task));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity deleteTask(@PathVariable UUID id, HttpServletRequest request){
+
+        var userRequest = request.getAttribute("idUser");
+        var task = this.taskRepository.findById(id).orElse(null);
+
+        if(task == null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("A tarefa não existe");
+        }
+
+        if(task.getIdUser() == null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Usuário não existe");
+        }
+
+        if(!userRequest.equals(task.getIdUser())){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Usuário não autorizado");
+        }
+
+        this.taskRepository.deleteById(id);
+        return ResponseEntity.status(HttpStatus.OK).body("Tarefa deletada com sucesso");
     }
 
 }
